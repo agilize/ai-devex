@@ -1,8 +1,10 @@
-# skills-md
+# ai-devex
 
 Claude Code skills for Agilize.
 
 ## Skills
+
+Skills are located in the `skills/` directory.
 
 ### agilize-presentation
 
@@ -21,5 +23,5 @@ Create polished, animated HTML slide presentations following the Agilize design 
 To install a skill locally:
 
 ```bash
-cp -r agilize-presentation ~/.claude/skills/
+cp -r skills/agilize-presentation ~/.claude/skills/
 ```
