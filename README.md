@@ -1,34 +1,34 @@
 # ai-devex
 
-Suite de IA para o dia a dia dos devs da Agilize — skills, agentes, MCPs e mais.
+AI suite for Agilize devs — skills, agents, MCPs, and more.
 
-## O que tem aqui
+## What's here
 
-| Pasta | O que é |
+| Folder | Description |
 |---|---|
-| `skills/` | Skills para Claude Code — contexto e comportamentos especializados |
-| `agents/` | Agentes autônomos para tarefas específicas _(em breve)_ |
-| `mcps/` | Servidores MCP para integrar ferramentas internas _(em breve)_ |
+| `skills/` | Claude Code skills — specialized context and behaviors |
+| `agents/` | Autonomous agents for specific tasks _(coming soon)_ |
+| `mcps/` | MCP servers to integrate internal tools _(coming soon)_ |
 
 ## Skills
 
 ### agilize-presentation
 
-Gera apresentações HTML animadas no estilo visual da Agilize — cobre, slides de conteúdo, navegação por teclado/touch, blobs animados.
+Generates animated HTML presentations in Agilize's visual style — cover slides, content slides, keyboard/touch navigation, animated blob backgrounds.
 
 ```bash
 cp -r skills/agilize-presentation ~/.claude/skills/
 ```
 
-## Como usar as skills
+## How to use skills
 
-Skills ficam em `~/.claude/skills/`. Depois de copiar, o Claude Code as carrega automaticamente.
+Skills live in `~/.claude/skills/`. Once copied, Claude Code loads them automatically.
 
 ```bash
-# Instalar uma skill
-cp -r skills/<nome> ~/.claude/skills/
+# Install a skill
+cp -r skills/<name> ~/.claude/skills/
 
-# Ou clonar o repo e linkar
+# Or clone the repo and copy
 git clone git@github.com:agilize/ai-devex.git
-cp -r ai-devex/skills/<nome> ~/.claude/skills/
+cp -r ai-devex/skills/<name> ~/.claude/skills/
 ```
