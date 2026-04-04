@@ -14,9 +14,9 @@ AI suite for Agilize devs — skills, agents, MCPs, and more.
 
 ### slide-presentations
 
-Generates animated HTML slide presentations with theme support — cover slides, content slides, keyboard/touch navigation, slide preview thumbnails, and a theme-driven design system.
+Generates branded HTML slide presentations with a custom engine (CSS/JS inline). Accepts natural language or explicit flags. Can create from scratch or redesign an existing PDF/PPTX. Themes define colors, typography, layouts, and slide patterns.
 
-**Themes** define the visual identity (colors, typography, cover style). Available themes:
+**Themes** define the full visual identity (colors, typography, slide layouts, decorative elements). Available themes:
 
 | Theme | Style |
 |---|---|

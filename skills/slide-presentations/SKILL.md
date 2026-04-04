@@ -1,38 +1,308 @@
 ---
 name: slide-presentations
-description: Create polished, animated HTML slide presentations with theme support. Use this skill whenever the user asks to create a presentation, slide deck, pitch deck, or wants to present information in slides. Also trigger when the user says things like "make slides for", "create a deck about", "build a presentation on", or "I need to present this". The skill produces a single self-contained HTML file with keyboard navigation, animated transitions, and a theme-driven design system.
+description: Generate branded HTML slide presentations with a custom engine. Accepts natural language or explicit flags. Can create from scratch or redesign an existing PDF/PPTX. Themes define colors, typography, layouts, and slide patterns. Interactive theme selection when not specified.
+disable-model-invocation: true
+argument-hint: <natural language description or flags>
 ---
 
-# Slide Presentations
+# /slide-presentations — Branded Slide Generator
 
-Create single-file HTML presentations that feel premium and cohesive. Every presentation follows a consistent architecture with smooth slide transitions, entrance animations, and full keyboard/touch navigation. The visual identity is driven by a **theme** — a set of colors, typography, and component styles.
+> Gera apresentações HTML completas com motor custom (CSS/JS inline) e temas visuais de marca.
+> Aceita linguagem natural ou flags explícitas. Cria do zero ou redesenha uma existente.
+> Output: arquivo HTML standalone pronto para apresentar — sem dependências externas além de fontes CDN.
 
-## Themes
+---
 
-Themes define the visual identity of a presentation. Each theme provides:
-- CSS custom properties (colors, accents, neutrals)
-- Typography (font family, weights, scale)
-- Cover slide style (background, decorative elements)
-- Gradient patterns and shadow colors
-- External CDN dependencies (fonts, icons)
+## Exemplos de uso
 
-Available themes live in `themes/<name>/theme.md`. Read the theme file to load the design tokens and visual rules before building slides.
+```bash
+# Linguagem natural
+/slide-presentations crie uma apresentação sobre OKRs com o tema agilize
+/slide-presentations redesenhe a apresentação ~/Downloads/palestra.pdf usando agilize
+/slide-presentations refaça ~/Desktop/aula.pptx com 10 slides no tema agilize
 
-### Available Themes
+# Flags explícitas
+/slide-presentations topic="OKRs Q2 2026" theme=agilize slides=12
+/slide-presentations from=~/Downloads/palestra.pdf theme=agilize
+/slide-presentations outline=OUTLINE.md theme=agilize lang=en
 
-| Theme | Style |
-|---|---|
-| `agilize` | Purple-centric, Quicksand typography, animated blob covers. Confident, warm, professional. |
+# Misto
+/slide-presentations from=palestra.pdf crie com tema agilize e 10 slides
+```
 
-When the user doesn't specify a theme, default to `agilize`. When creating a new theme, follow the same structure as existing theme files.
+---
 
-## Design Philosophy
+## Fase 0 — Interpretar intenção do usuário
 
-Presentations feel modern and clean — not corporate-boring, not startup-flashy. The design relies on generous whitespace, subtle animations, and restrained color use. The primary brand color is the signature; other colors appear as accents for categorization but never compete with the layout.
+> **Emitir:** `▶ [0/6] Interpretando solicitação`
 
-## Architecture
+### 0.1 — Parser dual (flags + linguagem natural)
 
-Every presentation is a **single HTML file** with embedded CSS and JS. No build tools, no dependencies beyond CDN links defined by the theme. These files get shared via Slack, opened directly in browsers, and projected in meetings — they need to Just Work.
+Tentar resolver por **flags** primeiro (instantâneo):
+
+```
+Flags reconhecidas:
+  from=<path>           Arquivo fonte (PDF, PPTX, PPT) para redesenhar
+  outline=<path>        Outline estruturado em markdown
+  topic="<texto>"       Tópico para criar do zero
+  theme=<nome>          Nome do tema visual
+  slides=<N>            Número aproximado de slides (default: 12-15)
+  lang=<pt|en|es>       Idioma do conteúdo (default: pt-BR)
+```
+
+Se flags não cobrem tudo, **interpretar o texto livre** para extrair:
+
+```
+Do texto do usuário, identificar:
+  ┌─────────────┬──────────────────────────────────────────────────┐
+  │ Ação        │ "crie/cria/nova/novo" → CRIAR DO ZERO            │
+  │             │ "redesenhe/refaça/refazer/transforme" → REDESIGN  │
+  │             │ nenhum verbo claro → CRIAR DO ZERO (default)      │
+  ├─────────────┼──────────────────────────────────────────────────┤
+  │ Fonte       │ qualquer path com extensão .pdf/.pptx/.ppt       │
+  ├─────────────┼──────────────────────────────────────────────────┤
+  │ Tema        │ nome após "tema"/"theme"/"com o tema"/"usando"   │
+  │             │ se não encontrado → NÃO DEFINIDO (perguntar)     │
+  ├─────────────┼──────────────────────────────────────────────────┤
+  │ Tópico      │ "sobre X" / "apresentação de X"                  │
+  ├─────────────┼──────────────────────────────────────────────────┤
+  │ Slides      │ número mencionado ("10 slides", "com 15 slides") │
+  ├─────────────┼──────────────────────────────────────────────────┤
+  │ Idioma      │ "em inglês"/"in english" → en | default: pt-BR   │
+  └─────────────┴──────────────────────────────────────────────────┘
+```
+
+### 0.2 — Validar e confirmar entendimento
+
+Emitir resumo:
+
+```
+ENTENDI:
+  Ação:     CRIAR DO ZERO | REDESENHAR EXISTENTE
+  Fonte:    [path] (se redesign)
+  Tema:     [nome] ou ⚠️ não informado
+  Tópico:   [assunto] (se criar do zero)
+  Slides:   [N]
+  Idioma:   [lang]
+```
+
+---
+
+## Fase 1 — Resolver tema
+
+> **Emitir:** `▶ [1/6] Resolvendo tema`
+
+### 1.1 — Se tema foi informado
+
+```
+Ler: .claude/skills/slide-presentations/themes/[theme].md
+Se encontrado → carregar e avançar
+Se não encontrado → ir para 1.2
+```
+
+### 1.2 — Se tema NÃO foi informado ou não encontrado
+
+Listar todos os temas disponíveis:
+
+```bash
+ls .claude/skills/slide-presentations/themes/*.md
+```
+
+Apresentar ao usuário com preview de cada um (ler nome, descrição, cores principais, fontes, tom).
+
+```
+TEMAS DISPONÍVEIS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  1. [nome] — [descrição] ([cores principais])
+     [fontes] | Tom: [tom]
+  
+  ...
+
+  ─────────────────────────────────────
+  0. Criar um tema novo do zero
+     A partir de um styleguide (imagem/PDF) ou descrição textual
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Qual tema deseja usar? (número ou nome)
+```
+
+**⏸ PAUSA:** Aguardar resposta do usuário.
+
+### 1.3 — Criar tema novo (opção 0)
+
+#### Passo 1 — Coletar informações
+
+```
+NOVO TEMA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Para criar seu tema, preciso de:
+
+  1. Nome do tema (slug, ex: "minha-marca")
+
+  2. Referência visual — pelo menos uma:
+     □ Imagem de styleguide (path para PNG/JPG/PDF)
+     □ URL do site da marca
+     □ Descrição textual (cores, tom, público)
+
+  3. Tom desejado:
+     □ Profissional / Corporativo
+     □ Moderno / Minimalista
+     □ Lúdico / Colorido
+     □ Elegante / Refinado
+     □ Outro: ________
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**⏸ PAUSA:** Aguardar respostas.
+
+#### Passo 2 — Analisar referência
+
+- **Se imagem/PDF**: usar Read tool para analisar visualmente — extrair paleta, tipografia, elementos visuais, tom
+- **Se descrição textual**: usar as informações diretamente
+
+#### Passo 3 — Gerar arquivo de tema
+
+Criar `.claude/skills/slide-presentations/themes/[nome].md` seguindo a **mesma estrutura** dos temas existentes (usar um como base):
+
+```
+Estrutura obrigatória:
+  - CSS Custom Properties (cores: brand, neutrals, accents)
+  - Tipografia (Google Fonts link, escala, pesos por elemento)
+  - Cover Slide (background, elementos decorativos, estrutura HTML/CSS)
+  - Gradient Patterns
+  - Spacing Conventions
+  - Border Patterns
+  - Shadow Patterns
+  - External Dependencies (fonts CDN, icon library CDN)
+```
+
+#### Passo 4 — Apresentar para aprovação
+
+**⏸ PAUSA:** Se aprovar → carregar e avançar. Se ajustar → iterar.
+
+---
+
+## Fase 2 — Extrair ou criar conteúdo
+
+> **Emitir:** `▶ [2/6] Preparando conteúdo`
+
+### Caminho A — REDESIGN (arquivo fonte existe)
+
+#### 2A.1 — Ler o arquivo fonte
+
+**Se PDF:**
+```
+Usar Read tool com o path do arquivo.
+Para PDFs grandes (> 10 páginas): ler em blocos de 20 páginas.
+```
+
+**Se PPTX:**
+```bash
+pip install python-pptx 2>/dev/null
+
+python3 << 'PYEOF'
+from pptx import Presentation
+from pptx.util import Inches, Pt
+import json, sys
+
+prs = Presentation(sys.argv[1] if len(sys.argv) > 1 else "INPUT_PATH")
+slides_data = []
+
+for i, slide in enumerate(prs.slides):
+    slide_info = {
+        "number": i + 1,
+        "layout": slide.slide_layout.name if slide.slide_layout else "unknown",
+        "texts": [],
+        "notes": "",
+        "has_images": False,
+        "has_tables": False
+    }
+    
+    for shape in slide.shapes:
+        if shape.has_text_frame:
+            for paragraph in shape.text_frame.paragraphs:
+                text = paragraph.text.strip()
+                if text:
+                    slide_info["texts"].append({
+                        "text": text,
+                        "bold": any(run.font.bold for run in paragraph.runs if run.font.bold),
+                        "size": str(paragraph.runs[0].font.size) if paragraph.runs and paragraph.runs[0].font.size else "default"
+                    })
+        if shape.shape_type == 13:  # Picture
+            slide_info["has_images"] = True
+        if shape.has_table:
+            slide_info["has_tables"] = True
+    
+    if slide.has_notes_slide:
+        notes_frame = slide.notes_slide.notes_text_frame
+        slide_info["notes"] = notes_frame.text.strip()
+    
+    slides_data.append(slide_info)
+
+print(json.dumps(slides_data, indent=2, ensure_ascii=False))
+PYEOF
+```
+
+**Se PPT (formato antigo):**
+```bash
+libreoffice --headless --convert-to pdf "[path]" --outdir /tmp/
+# Depois ler o PDF gerado
+```
+
+#### 2A.2 — Gerar outline a partir do conteúdo
+
+```
+OUTLINE (extraído de [nome do arquivo])
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Slides originais: [N]
+Slides propostos: [N]
+
+  Slide │ Conteúdo (resumo)                  │ Tipo de slide
+  ──────┼────────────────────────────────────┼──────────────────
+  1     │ [título]                           │ Cover
+  2     │ [citação]                          │ Quote
+  3     │ [contexto]                         │ Content (grid/cards)
+  ...   │ ...                                │ ...
+  N     │ [encerramento]                     │ Cover (closing)
+```
+
+**⏸ PAUSA:** Apresentar outline. Aguardar aprovação ou ajustes.
+
+### Caminho B — CRIAR DO ZERO
+
+#### 2B.1 — Gerar outline
+
+```
+OUTLINE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Tópico: [assunto]
+Total de slides: [N]
+
+  #  │ Título                              │ Tipo de slide
+  ───┼─────────────────────────────────────┼──────────────────
+  1  │ [Título da apresentação]            │ Cover
+  2  │ [Citação impactante]                │ Quote
+  3  │ [Contexto / Por quê]                │ Content (cards)
+  4  │ [Seção principal]                   │ Content (grid)
+  ...│ ...                                 │ ...
+  N  │ [Encerramento / Perguntas]          │ Cover (closing)
+```
+
+**⏸ PAUSA:** Apresentar outline. Aguardar aprovação ou ajustes.
+
+### Caminho C — Sem tópico e sem arquivo → perguntar
+
+---
+
+## Fase 3 — Gerar apresentação HTML
+
+> **Emitir:** `▶ [3/6] Gerando apresentação`
+
+### Arquitetura
+
+Cada apresentação é um **único arquivo HTML** com CSS e JS inline. Sem build tools, sem frameworks, sem dependências além de fontes CDN definidas pelo tema. O arquivo precisa funcionar abrindo direto no browser, compartilhando via Slack, projetando em reuniões.
 
 ```
 presentation.html
@@ -49,126 +319,174 @@ presentation.html
 │   └── <script> (navigation logic)
 ```
 
-## Slide Types
+### Carregar referências
 
-### 1. Cover Slide (`.slide.cover`)
+Antes de gerar, ler os arquivos de referência para obter o CSS/HTML exato:
 
-Dark background with decorative elements (defined by the theme). Used for the opening, section dividers, and closing.
+1. **`references/components.md`** — HTML/CSS de cada componente (cards, grids, badges, cover, animations)
+2. **`references/navigation.md`** — CSS e JavaScript completo para navegação, thumbnails, touch, keyboard
+3. **`themes/[nome].md`** — Design tokens, paleta, tipografia, estilo do cover
 
-Structure:
+### Tipos de Slide
+
+#### 1. Cover Slide (`.slide.cover`)
+
+Fundo escuro com elementos decorativos definidos pelo tema (blobs, waves, gradients). Usado para abertura, divisores de seção, e encerramento.
+
 ```html
 <div class="slide cover active" data-slide="0" data-title="Title">
-  <!-- Theme decorative elements (e.g., blobs) -->
+  <!-- Theme decorative elements -->
   <div class="cover-content">
-    <!-- Content here: logo, title, subtitle, date badge -->
+    <!-- Content: logo, title, subtitle, date badge -->
   </div>
 </div>
 ```
 
-Do NOT set `position: relative` on `.cover` — it must inherit `position: absolute` from `.slide` for the stacking system to work correctly.
+**IMPORTANTE:** NÃO colocar `position: relative` no `.cover` — deve herdar `position: absolute` do `.slide` para o sistema de stacking funcionar.
 
-### 2. Content Slide (`.slide`)
+#### 2. Content Slide (`.slide`)
 
-White/light background, centered flex layout. Structure:
+Fundo branco/claro, layout flex centralizado:
+
 ```html
 <div class="slide" data-slide="1" data-title="Title" style="background: var(--white);">
   <div class="section-label fade-up">Section Name</div>
   <h2 class="slide-title fade-up">Title with <em>emphasis</em></h2>
-  <!-- Content: grids, cards, lists, etc. -->
+  <!-- Content: grids, cards, lists -->
 </div>
 ```
 
-### 3. Quote Slide
+#### 3. Quote Slide
 
-A vibrant single-color background with a centered blockquote. Good for opening with an impactful quote right after the cover.
+Fundo vibrante de cor única com blockquote centralizado. Bom para abrir com impacto logo após o cover.
 
-### 4. Grid/Card Slide
+#### 4. Grid/Card Slide
 
-Uses CSS Grid for structured layouts (teams, features, comparisons). Cards follow patterns defined in `references/components.md` with subtle borders, rounded corners, and hover lift effects.
+CSS Grid para layouts estruturados. Cards seguem os padrões de `references/components.md`.
 
-## Component Patterns
+### Design Philosophy
 
-Read `references/components.md` for full HTML/CSS of each component. Summary:
+Apresentações modernas e limpas — não corporate-boring, não startup-flashy. Whitespace generoso, animações sutis, uso restrito de cor. A cor primária da marca é a assinatura; outras cores são acentos que nunca competem com o layout.
 
-### Cards
-- **Context card**: Icon + title + description. 16px border-radius, 1px border, hover lifts -4px.
-- **Member card**: Avatar (48px circle) + name + role. 14px border-radius, flex layout.
-- **Number card**: Big number (56px, brand color) + label below. Good for stats/metrics.
-- **Staff card**: Larger avatar (72px) + name + title. Centered layout.
+### Construindo a Apresentação
 
-### Grids
-- 3-column for overview grids: `grid-template-columns: repeat(3, 1fr)`
-- 4-column for squad comparisons: `grid-template-columns: repeat(4, 1fr)`
-- Always `max-width: 1100px; width: 100%` to constrain and center
+1. **Carregar o tema** — ler o arquivo de tema para cores, tipografia, estilo do cover
+2. **Carregar referências** — ler `references/components.md` e `references/navigation.md`
+3. **Começar pelo cover** — usar a estrutura do tema (elementos decorativos + cover-content)
+4. **Planejar o arco narrativo** — que história os slides contam? Agrupar conteúdo relacionado
+5. **Usar section labels** para orientar ("Visão Geral", "Detalhes", "Próximos Passos")
+6. **Destacar palavras-chave** com `<em>` nos títulos — uma ou duas palavras no máximo
+7. **Fechar com cover** — mensagem de encerramento, "Perguntas?", ou call to action
+8. **Manter slides focados** — uma ideia por slide, whitespace generoso
+9. **Usar `fade-up` e `stagger`** em todos os elementos para animações de entrada polidas
+10. **Atribuir `data-slide` sequencial** começando de 0
+11. **Adicionar `data-title` em todo slide** — label curto para os tooltips de preview dos nav dots
 
-### Tags/Badges
-- Section label: uppercase, letter-spacing 4px, brand color
-- Squad tags: pill-shaped, 11px uppercase
-- Role badges: 9px, colored background, white text
-- Date badge: inline-block, bordered pill on cover slides
+### Detalhes Técnicos Importantes
 
-## Animation System
+- Todos os slides devem estar dentro de `.slide-container`
+- Primeiro slide recebe `.slide`, `.cover`, e `.active`
+- A classe `.slide` provê `position: absolute` — nunca sobrescrever com `position: relative` no `.cover`
+- Content slides usam `style="background: var(--white);"` inline
+- Cover slides não precisam de background inline (`.cover` usa o background do tema)
+- Nav dots são gerados dinamicamente via JS a partir de `document.querySelectorAll('.slide').length`
+- Classes de ícone dependem da icon library do tema (ex: Font Awesome `fa-solid fa-users`)
+- Usar `clamp()` para sizing responsivo em títulos
 
-### Fade-up entrance
-Add class `fade-up` to elements. They start `opacity: 0; translateY(20px)` and animate in when the parent slide gets `.active`. Sequential children get staggered delays (0.1s increments).
+### Referências
 
-### Stagger entrance
-Wrap children in a `.stagger` container. Each child animates in with 0.05s delay increments — feels like items cascading into view.
+- **`references/components.md`** — HTML/CSS completo de cada padrão de componente
+- **`references/navigation.md`** — CSS e JavaScript completo do sistema de navegação
+- **`themes/[nome].md`** — Design tokens e estilo visual do tema escolhido
 
-### Slide transitions
-Slides transition with `opacity` + `translateX(80px)` over 0.5s using `cubic-bezier(0.4, 0, 0.2, 1)`.
+**Ler o arquivo de referência apropriado quando precisar do CSS ou HTML exato de um componente.**
 
-## Navigation System
+---
 
-The JavaScript navigation handles:
-- **Keyboard**: Arrow keys to navigate, Space for next, Home/End for first/last
-- **Touch**: Swipe gestures (>50px threshold)
-- **Click**: Nav dots at bottom (pill bar with blur backdrop), arrow buttons on sides
-- **Counter**: Top-left shows `01 / 15` format
-- **Logo**: Small logo appears top-center on content slides, hidden on all cover slides
-- **Slide Preview Tooltips**: Hovering a nav dot shows a miniature thumbnail of the corresponding slide with a frosted-glass pill label showing the slide title
+## Fase 4 — Refinar e polir
 
-The `goToSlide()` function manages the active class, exit animations, counter updates, and nav dot state. The slide counter adapts its color on cover slides (white text) vs content slides (brand/gray).
+> **Emitir:** `▶ [4/6] Refinando apresentação`
 
-### Slide Preview Tooltips
+### 4.1 — Consistência visual
 
-Each nav dot renders a hover preview with:
-- A **scaled-down clone** of the actual slide content as thumbnail (cover-fit scaling)
-- A **title label pill** overlaid at the bottom (frosted glass, `backdrop-filter: blur(8px)`)
-- Smooth `opacity` + `scale` entrance animation on hover
+- [ ] Todas as cores vêm do tema (nenhuma cor hardcoded fora da paleta)
+- [ ] Tipografia consistente (mesmas fontes em todos os slides)
+- [ ] Espaçamento uniforme
+- [ ] Elementos decorativos consistentes
+- [ ] Logo aparece em content slides, oculto em cover slides
 
-Slide titles come from the `data-title` attribute on each `.slide` element. Always add `data-title` to every slide.
+### 4.2 — Animações
 
-## Building a Presentation
+- [ ] `fade-up` em todos os elementos de conteúdo
+- [ ] `stagger` em grids e listas para cascata de entrada
+- [ ] Delays escalonados (0.1s incrementos) para sequência natural
+- [ ] Transições de slide com translateX + opacity
 
-When creating a new presentation:
+### 4.3 — Navegação
 
-1. **Load the theme** — read the theme file to get colors, typography, and cover style
-2. **Start with the cover slide** — use the theme's cover structure (decorative elements + cover-content)
-3. **Plan the narrative arc** — what story do the slides tell? Group related content.
-4. **Use section labels** to orient the audience ("Overview", "Details", "Next Steps")
-5. **Highlight key words** with `<em>` in slide titles — one or two words max
-6. **End with a cover slide** — closing message, "Questions?" prompt, or call to action
-7. **Keep slides focused** — one idea per slide, generous whitespace
-8. **Use `fade-up` and `stagger`** on all content elements for polished entrance animations
-9. **Assign sequential `data-slide` attributes** starting from 0
-10. **Add `data-title` to every slide** — a short label used by the nav dot preview tooltips
+- [ ] Nav dots gerados corretamente
+- [ ] Preview tooltips com `data-title` em todo slide
+- [ ] Keyboard (arrows, space, home/end)
+- [ ] Touch (swipe > 50px threshold)
+- [ ] Counter adapta cor em slides escuros vs claros
 
-## Important Technical Details
+---
 
-- All slides must be inside `.slide-container`
-- First slide gets both `.slide` and `.cover` and `.active` classes
-- The `.slide` class provides `position: absolute` — never override this with `position: relative` on `.cover` or any variant, as this breaks the stacking
-- Content slides use inline `style="background: var(--white);"`
-- Cover slides need no inline background (`.cover` class provides the theme's dark background)
-- The nav dots are generated dynamically from `document.querySelectorAll('.slide').length`
-- Icon classes depend on the theme's icon library (e.g., Font Awesome `fa-solid fa-users`)
-- Use `clamp()` for responsive text sizing on titles
+## Fase 5 — Entrega
 
-## Reference Files
+> **Emitir:** `▶ [5/6] Entrega`
 
-- `references/components.md` — Full HTML/CSS for every component pattern (cards, grids, badges, cover, animations)
-- `references/navigation.md` — Complete CSS and JavaScript for slide navigation, thumbnails, touch handling, and keyboard controls
-- `themes/<name>/theme.md` — Design tokens, color palette, typography, and cover style for the chosen theme
+### 5.1 — Salvar arquivo
 
-Read the appropriate reference file when you need the exact CSS or HTML for a specific component.
+```bash
+mkdir -p slides
+# slides/[slug-do-topico].html
+```
+
+### 5.2 — Instruções de uso
+
+```
+APRESENTAÇÃO GERADA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Arquivo:    slides/[nome].html
+Tema:       [nome do tema]
+Slides:     [N] slides
+
+Para apresentar:
+  Abrir slides/[nome].html no navegador
+  Teclas: ← → (navegar) | Space (avançar) | Home/End (primeiro/último)
+
+Para editar:
+  O arquivo é HTML puro — editar em qualquer editor de texto
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+---
+
+## Fase 6 — Iteração (opcional)
+
+> **Emitir:** `▶ [6/6] Revisão com o usuário`
+
+```
+Deseja ajustar algo?
+  • Trocar conteúdo de um slide específico
+  • Mudar layout de algum slide
+  • Adicionar ou remover slides
+  • Ajustar cores ou tipografia
+  • Nada — está perfeito ✓
+```
+
+---
+
+## Regras
+
+1. **Parser dual** — flags explícitas têm prioridade; linguagem natural preenche o que faltar
+2. **Tema é lei** — todas as decisões visuais vêm do arquivo de tema; nunca inventar cores/fontes
+3. **Tema obrigatório** — se não informado, SEMPRE perguntar (listar disponíveis + opção de criar)
+4. **Motor custom** — HTML/CSS/JS inline, NUNCA usar reveal.js ou frameworks de slides; copiar os padrões exatos de `references/components.md` e `references/navigation.md`
+5. **Standalone** — o HTML não depende de arquivos locais (fontes/ícones via CDN)
+6. **Anti-stub** — todo slide tem conteúdo real, nunca placeholder genérico
+7. **Variação visual** — alternar layouts e fundos para manter interesse
+8. **Brand-first** — logo, cores, tipografia da marca são inegociáveis
+9. **Pausa antes de gerar** — o outline SEMPRE é apresentado ao usuário antes da geração
+10. **Ler referências** — SEMPRE ler `references/components.md`, `references/navigation.md`, e `themes/[nome].md` antes de gerar qualquer slide
