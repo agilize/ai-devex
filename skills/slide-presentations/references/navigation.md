@@ -51,7 +51,7 @@ Place these elements before the `.slide-container`:
 .nav-dot.active { background: var(--purple); width: 36px; border-radius: 6px; }
 .nav-dot:hover:not(.active) { background: var(--purple-light); opacity: 0.6; }
 
-/* ─── Slide Preview Tooltip ─── */
+/* --- Slide Preview Tooltip --- */
 .nav-dot .slide-preview {
   position: absolute;
   bottom: calc(100% + 16px);

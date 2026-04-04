@@ -1,139 +1,26 @@
 # Component Library
 
 ## Table of Contents
-1. [Cover Slide](#cover-slide)
-2. [Content Slide](#content-slide)
-3. [Section Label & Title](#section-label--title)
-4. [Context Cards Grid](#context-cards-grid)
-5. [Member Cards](#member-cards)
-6. [Number Cards](#number-cards)
-7. [Staff Cards](#staff-cards)
-8. [Overview Grid (Compact)](#overview-grid-compact)
-9. [Squad Overview Cards (Colored)](#squad-overview-cards-colored)
-10. [Hierarchy Layout](#hierarchy-layout)
-11. [Role Legend](#role-legend)
-12. [Tags & Badges](#tags--badges)
-13. [Timeline](#timeline)
-14. [Quote Slide](#quote-slide)
-15. [Closing Slide](#closing-slide)
-
----
-
-## Cover Slide
-
-```html
-<div class="slide cover active" data-slide="0">
-  <div class="cover-blob"></div>
-  <div class="cover-blob"></div>
-  <div class="cover-blob"></div>
-  <div class="cover-blob"></div>
-  <div class="cover-blob"></div>
-  <div class="cover-blob"></div>
-  <div class="cover-content">
-    <div class="fade-up" style="margin-bottom: 32px;">
-      <div class="cover-logo-heartbeat">
-        <img src="assets/logo-branca.png" alt="Logo" style="height: 56px; opacity: 0.9;">
-      </div>
-    </div>
-    <div class="logo-text fade-up">Company Name</div>
-    <div class="decorative-line fade-up"></div>
-    <h1 class="fade-up" style="font-size: clamp(48px, 7vw, 80px);">
-      Presentation Title
-    </h1>
-    <div class="date-badge fade-up">
-      <i class="fa-solid fa-users"></i>&nbsp; Event Name
-    </div>
-  </div>
-</div>
-```
-
-```css
-.cover {
-  background: #1B0A2E;
-  color: var(--white); text-align: center; overflow: hidden;
-}
-.cover::before, .cover::after { content: none; }
-
-.cover-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.7;
-  z-index: 0;
-}
-
-.cover-blob:nth-child(1) {
-  width: 500px; height: 500px;
-  background: #5C2D91;
-  top: -10%; left: -5%;
-  animation: drift1 16s ease-in-out infinite alternate;
-}
-.cover-blob:nth-child(2) {
-  width: 400px; height: 400px;
-  background: #1ABC9C;
-  opacity: 0.35;
-  bottom: -15%; right: -5%;
-  animation: drift2 20s ease-in-out infinite alternate;
-}
-.cover-blob:nth-child(3) {
-  width: 350px; height: 350px;
-  background: #9B59B6;
-  top: 50%; left: 60%;
-  animation: drift3 18s ease-in-out infinite alternate;
-}
-.cover-blob:nth-child(4) {
-  width: 300px; height: 450px;
-  background: #2980B9;
-  opacity: 0.3;
-  top: 10%; right: 20%;
-  animation: drift4 22s ease-in-out infinite alternate;
-}
-.cover-blob:nth-child(5) {
-  width: 450px; height: 300px;
-  background: #E67E22;
-  opacity: 0.2;
-  bottom: 10%; left: 30%;
-  animation: drift5 19s ease-in-out infinite alternate;
-}
-.cover-blob:nth-child(6) {
-  width: 350px; height: 350px;
-  background: #3D1A6E;
-  top: 30%; left: 10%;
-  animation: drift6 24s ease-in-out infinite alternate;
-}
-
-@keyframes drift1 { 0% { transform: translate(0, 0); } 100% { transform: translate(30vw, 40vh); } }
-@keyframes drift2 { 0% { transform: translate(0, 0); } 100% { transform: translate(-35vw, -30vh); } }
-@keyframes drift3 { 0% { transform: translate(0, 0); } 100% { transform: translate(-25vw, -45vh); } }
-@keyframes drift4 { 0% { transform: translate(0, 0); } 100% { transform: translate(-20vw, 35vh); } }
-@keyframes drift5 { 0% { transform: translate(0, 0); } 100% { transform: translate(25vw, -25vh); } }
-@keyframes drift6 { 0% { transform: translate(0, 0); } 100% { transform: translate(20vw, 30vh); } }
-
-@keyframes heartbeat {
-  0% { transform: scale(1); }
-  8% { transform: scale(1.15); }
-  16% { transform: scale(1); }
-  24% { transform: scale(1.10); }
-  32% { transform: scale(1); }
-  100% { transform: scale(1); }
-}
-
-.cover-logo-heartbeat { animation: heartbeat 1s ease-in-out infinite; display: inline-block; }
-.cover-content { position: relative; z-index: 2; }
-.cover .logo-text { font-size: 18px; font-weight: 300; letter-spacing: 8px; text-transform: uppercase; opacity: 0.7; margin-bottom: 40px; }
-.cover h1 { font-size: clamp(36px, 5vw, 64px); font-weight: 700; line-height: 1.2; margin-bottom: 16px; }
-.cover h1 span { display: block; font-weight: 300; font-size: 0.55em; opacity: 0.8; margin-top: 8px; }
-
-.date-badge { display: inline-block; margin-top: 32px; padding: 10px 28px; border: 1px solid rgba(255,255,255,0.3); border-radius: 30px; font-weight: 500; font-size: 14px; letter-spacing: 1px; }
-.decorative-line { width: 60px; height: 3px; background: rgba(255,255,255,0.4); border-radius: 2px; margin: 24px auto; }
-```
+1. [Content Slide](#content-slide)
+2. [Section Label & Title](#section-label--title)
+3. [Context Cards Grid](#context-cards-grid)
+4. [Member Cards](#member-cards)
+5. [Number Cards](#number-cards)
+6. [Staff Cards](#staff-cards)
+7. [Overview Grid (Compact)](#overview-grid-compact)
+8. [Squad Overview Cards (Colored)](#squad-overview-cards-colored)
+9. [Hierarchy Layout](#hierarchy-layout)
+10. [Role Legend](#role-legend)
+11. [Tags & Badges](#tags--badges)
+12. [Timeline](#timeline)
+13. [Quote Slide](#quote-slide)
 
 ---
 
 ## Content Slide
 
 ```html
-<div class="slide" data-slide="1" style="background: var(--white);">
+<div class="slide" data-slide="1" data-title="Title" style="background: var(--white);">
   <div class="section-label fade-up"><i class="fa-solid fa-icon"></i> Section Name</div>
   <h2 class="slide-title fade-up">Title with <em>emphasis</em></h2>
   <!-- Content goes here -->
@@ -440,7 +327,7 @@ Used on cover slides for roadmaps/next steps.
 ## Quote Slide
 
 ```html
-<div class="slide" data-slide="1" style="background: #00E68D; color: var(--gray-800); display: flex; align-items: center; justify-content: center;">
+<div class="slide" data-slide="1" data-title="Quote" style="background: #00E68D; color: var(--gray-800); display: flex; align-items: center; justify-content: center;">
   <div class="cover-content" style="max-width: 800px; text-align: center;">
     <div class="fade-up" style="font-size: 28px; opacity: 0.4; margin-bottom: 40px;">
       <i class="fa-solid fa-quote-left"></i>
@@ -451,27 +338,6 @@ Used on cover slides for roadmaps/next steps.
     <cite class="fade-up" style="display: block; margin-top: 36px; font-size: 16px; font-weight: 600; opacity: 0.6; font-style: normal;">
       — Author Name
     </cite>
-  </div>
-</div>
-```
-
----
-
-## Closing Slide
-
-Same structure as cover slide but with closing content:
-
-```html
-<div class="slide cover" data-slide="N">
-  <div class="cover-blob"></div>
-  <div class="cover-blob"></div>
-  <div class="cover-blob"></div>
-  <div class="cover-blob"></div>
-  <div class="cover-blob"></div>
-  <div class="cover-blob"></div>
-  <div class="cover-content">
-    <p class="fade-up" style="font-size: clamp(28px, 4vw, 48px); font-weight: 700; letter-spacing: 1px; color: #FFFFFF;">Questions?</p>
-    <p class="fade-up" style="font-size: 14px; opacity: 0.4; margin-top: 24px; letter-spacing: 2px; text-transform: uppercase; color: #FFFFFF;">Event Name — Year</p>
   </div>
 </div>
 ```

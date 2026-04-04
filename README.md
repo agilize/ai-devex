@@ -12,12 +12,18 @@ AI suite for Agilize devs — skills, agents, MCPs, and more.
 
 ## Skills
 
-### agilize-presentation
+### slide-presentations
 
-Generates animated HTML presentations in Agilize's visual style — cover slides, content slides, keyboard/touch navigation, animated blob backgrounds.
+Generates animated HTML slide presentations with theme support — cover slides, content slides, keyboard/touch navigation, slide preview thumbnails, and a theme-driven design system.
+
+**Themes** define the visual identity (colors, typography, cover style). Available themes:
+
+| Theme | Style |
+|---|---|
+| `agilize` | Purple-centric, Quicksand typography, animated blob covers |
 
 ```bash
-cp -r skills/agilize-presentation ~/.claude/skills/
+cp -r skills/slide-presentations ~/.claude/skills/
 ```
 
 ## How to use skills
