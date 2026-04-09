@@ -7,6 +7,7 @@ AI suite for Agilize devs — skills, agents, MCPs, and more.
 | Folder | Description |
 |---|---|
 | `skills/` | Claude Code skills — specialized context and behaviors |
+| `scripts/` | Shell scripts for Claude Code configuration (status line, hooks, etc.) |
 | `agents/` | Autonomous agents for specific tasks _(coming soon)_ |
 | `mcps/` | MCP servers to integrate internal tools _(coming soon)_ |
 
@@ -25,6 +26,39 @@ Generates branded HTML slide presentations with a custom engine (CSS/JS inline).
 ```bash
 cp -r skills/slide-presentations ~/.claude/skills/
 ```
+
+## Scripts
+
+### statusline.sh
+
+A compact status line for Claude Code showing: working directory, git branch + dirty state, active model, context window usage (color-coded bar), rate limits, and session duration.
+
+```
+ai-devex (feat/my-branch)* | Sonnet | ctx [████████░░] 78% | 5h:12% 7d:34% | 42m
+```
+
+**Install:**
+
+```bash
+cp scripts/statusline.sh ~/.claude/statusline.sh
+chmod +x ~/.claude/statusline.sh
+```
+
+**Register in `~/.claude/settings.json`:**
+
+```json
+{
+  "statusline": {
+    "command": "~/.claude/statusline.sh"
+  }
+}
+```
+
+Or use the built-in agent: type `/statusline-setup` inside Claude Code and it will configure `settings.json` for you.
+
+**Requirements:** `jq`, `git`, `stat` (standard on Linux/macOS).
+
+---
 
 ## How to use skills
 
